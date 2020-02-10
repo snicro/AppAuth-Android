@@ -15,31 +15,31 @@
 package net.openid.appauth;
 
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * An OpenID end session request.
+ * An AWS Cognito end session request.
  *
  * NOTE: That is a draft implementation
  *
- * @see "OpenID Connect Session Management 1.0 - draft 28, 5 RP-Initiated Logout
- * <https://openid.net/specs/openid-connect-session-1_0.html#RPLogout>"
+ * @see "AWS Cognito Developer Guide LOGOUT Endpoint
+ * <https://docs.aws.amazon.com/cognito/latest/developerguide/logout-endpoint.html>"
  */
 public class EndSessionRequest extends AuthorizationManagementRequest {
 
-    private static final String PARAM_ID_TOKEN_HINT = "id_token_hint";
-    private static final String PARAM_REDIECT_URI = "post_logout_redirect_uri";
+    private static final String PARAM_CLIENT_ID = "client_id";
+    private static final String PARAM_REDIRECT_URI = "logout_uri";
     private static final String PARAM_STATE = "state";
     private static final String KEY_CONFIGURATION = "configuration";
 
     @VisibleForTesting
-    static final String KEY_ID_TOKEN_HINT = "id_token_hint";
+    static final String KEY_CLIENT_ID = "client_id";
     @VisibleForTesting
-    static final String KEY_REDIECT_URI = "post_logout_redirect_uri";
+    static final String KEY_REDIRECT_URI = "logout_uri";
     @VisibleForTesting
     static final String KEY_STATE = "state";
 
@@ -66,7 +66,7 @@ public class EndSessionRequest extends AuthorizationManagementRequest {
      * <http://openid.net/specs/openid-connect-core-1_0.html#IDToken>"
      */
     @NonNull
-    public final String idToken;
+    public final String clientId;
 
     /**
      * The client's redirect URI.
@@ -94,14 +94,14 @@ public class EndSessionRequest extends AuthorizationManagementRequest {
 
     @VisibleForTesting
     EndSessionRequest(@NonNull AuthorizationServiceConfiguration configuration,
-                              @NonNull String idToken, @NonNull Uri redirectUri,
+                              @NonNull String clientId, @NonNull Uri redirectUri,
                               @NonNull String state) {
         Preconditions.checkNotNull(configuration, "Configuration can not be null");
-        Preconditions.checkNotNull(idToken, "IdToken can not be null");
+        Preconditions.checkNotNull(clientId, "ClientId can not be null");
         Preconditions.checkNotNull(redirectUri, "RedirectUri can not be null");
         Preconditions.checkNotNull(state, "State can not be null");
         this.configuration = configuration;
-        this.idToken = idToken;
+        this.clientId = clientId;
         this.redirectUri = redirectUri;
         this.state = state;
     }
@@ -110,8 +110,8 @@ public class EndSessionRequest extends AuthorizationManagementRequest {
      * Creates new EndSessionRequest with mandatory parameters
      */
     public EndSessionRequest(@NonNull AuthorizationServiceConfiguration configuration, @NonNull
-            String idToken,  @NonNull Uri redirectUri) {
-        this(configuration, idToken, redirectUri,
+            String clientId,  @NonNull Uri redirectUri) {
+        this(configuration, clientId, redirectUri,
                 AuthorizationManagementRequest.generateRandomState());
     }
 
@@ -119,8 +119,8 @@ public class EndSessionRequest extends AuthorizationManagementRequest {
     public JSONObject jsonSerialize() {
         JSONObject json = new JSONObject();
         JsonUtil.put(json, KEY_CONFIGURATION, configuration.toJson());
-        JsonUtil.put(json, KEY_ID_TOKEN_HINT, idToken);
-        JsonUtil.put(json, KEY_REDIECT_URI, redirectUri.toString());
+        JsonUtil.put(json, KEY_CLIENT_ID, clientId);
+        JsonUtil.put(json, KEY_REDIRECT_URI, redirectUri.toString());
         JsonUtil.put(json, KEY_STATE, state);
         return json;
     }
@@ -139,8 +139,8 @@ public class EndSessionRequest extends AuthorizationManagementRequest {
     @Override
     public Uri toUri() {
         Uri.Builder uriBuilder = configuration.endSessionEndpoint.buildUpon()
-                .appendQueryParameter(PARAM_REDIECT_URI, redirectUri.toString())
-                .appendQueryParameter(PARAM_ID_TOKEN_HINT, idToken)
+                .appendQueryParameter(PARAM_REDIRECT_URI, redirectUri.toString())
+                .appendQueryParameter(PARAM_CLIENT_ID, clientId)
                 .appendQueryParameter(PARAM_STATE, state);
         return  uriBuilder.build();
     }
@@ -150,8 +150,8 @@ public class EndSessionRequest extends AuthorizationManagementRequest {
         Preconditions.checkNotNull(jsonObject, "json cannot be null");
         return new EndSessionRequest(
             AuthorizationServiceConfiguration.fromJson(jsonObject.getJSONObject(KEY_CONFIGURATION)),
-            JsonUtil.getString(jsonObject, KEY_ID_TOKEN_HINT),
-            JsonUtil.getUri(jsonObject, KEY_REDIECT_URI),
+            JsonUtil.getString(jsonObject, KEY_CLIENT_ID),
+            JsonUtil.getUri(jsonObject, KEY_REDIRECT_URI),
             JsonUtil.getString(jsonObject, KEY_STATE)
         );
     }
@@ -164,7 +164,7 @@ public class EndSessionRequest extends AuthorizationManagementRequest {
     }
 
     static boolean isEndSessionRequest(JSONObject json) {
-        return json.has(KEY_REDIECT_URI);
+        return json.has(KEY_REDIRECT_URI);
     }
 
 }

@@ -19,7 +19,7 @@ public class EndSessionRequestTest {
 
     @Test(expected = NullPointerException.class)
     public void buildWithNulConfiguration_NullPointerException() {
-        new EndSessionRequest(null, TestValues.TEST_ID_TOKEN, TestValues.TEST_APP_REDIRECT_URI);
+        new EndSessionRequest(null, TestValues.TEST_CLIENT_ID, TestValues.TEST_APP_REDIRECT_URI);
     }
 
     @Test(expected = NullPointerException.class)
@@ -29,12 +29,12 @@ public class EndSessionRequestTest {
 
     @Test(expected = NullPointerException.class)
     public void buildWithNullRedirectUri_NullPointerException() {
-        new EndSessionRequest(TestValues.getTestServiceConfig(), TestValues.TEST_ID_TOKEN, null);
+        new EndSessionRequest(TestValues.getTestServiceConfig(), TestValues.TEST_CLIENT_ID, null);
     }
 
     @Test
     public void getState_notNull() {
-        EndSessionRequest request = new EndSessionRequest(TestValues.getTestServiceConfig(), TestValues.TEST_ID_TOKEN, TestValues.TEST_APP_REDIRECT_URI);
+        EndSessionRequest request = new EndSessionRequest(TestValues.getTestServiceConfig(), TestValues.TEST_CLIENT_ID, TestValues.TEST_APP_REDIRECT_URI);
         assertNotNull(request.getState());
     }
 
@@ -43,7 +43,7 @@ public class EndSessionRequestTest {
         EndSessionRequest request = TestValues.getTestEndSessionRequest();
         Uri requestUri = request.toUri();
 
-        assertThat(requestUri.getQueryParameter(EndSessionRequest.KEY_ID_TOKEN_HINT))
+        assertThat(requestUri.getQueryParameter(EndSessionRequest.KEY_CLIENT_ID))
             .isEqualTo(request.idToken);
         assertThat(requestUri.getQueryParameter(EndSessionRequest.KEY_REDIECT_URI))
             .isEqualTo(request.redirectUri.toString());
@@ -56,7 +56,7 @@ public class EndSessionRequestTest {
     public void testJsonSerialize() throws Exception {
         EndSessionRequest resquest = TestValues.getTestEndSessionRequest();
         EndSessionRequest copy = serializeDeserialize(resquest);
-        assertThat(copy.idToken).isEqualTo(TestValues.TEST_ID_TOKEN);
+        assertThat(copy.idToken).isEqualTo(TestValues.TEST_CLIENT_ID);
         assertThat(copy.state).isEqualTo(resquest.state);
         assertThat(copy.redirectUri).isEqualTo(resquest.redirectUri);
     }
