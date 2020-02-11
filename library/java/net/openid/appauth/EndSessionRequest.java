@@ -57,13 +57,7 @@ public class EndSessionRequest extends AuthorizationManagementRequest {
     public final AuthorizationServiceConfiguration configuration;
 
     /**
-     * An OpenID Connect ID Token. Contains claims about the authentication of an End-User by an
-     * Authorization Server.
-     *
-     * @see "OpenID Connect Session Management 1.0 - draft 28, 5 RP-Initiated Logout
-     * <https://openid.net/specs/openid-connect-session-1_0.html#RPLogout>"
-     * @see "OpenID Connect Core ID Token, Section 2
-     * <http://openid.net/specs/openid-connect-core-1_0.html#IDToken>"
+     * Client id
      */
     @NonNull
     public final String clientId;

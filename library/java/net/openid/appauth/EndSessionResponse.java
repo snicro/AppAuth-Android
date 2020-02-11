@@ -52,23 +52,14 @@ public class EndSessionResponse extends AuthorizationManagementResponse {
     @NonNull
     public final EndSessionRequest endSessionRequest;
 
-    /**
-     * The returned state parameter, which must match the value specified in the request.
-     * AppAuth for Android ensures that this is the case.
-     */
-    @NonNull
-    public final String state;
-
-    EndSessionResponse(@NonNull EndSessionRequest endSessionRequest, @NonNull String state) {
+    EndSessionResponse(@NonNull EndSessionRequest endSessionRequest) {
         Preconditions.checkNotNull(endSessionRequest);
-        Preconditions.checkNotNull(state);
         this.endSessionRequest = endSessionRequest;
-        this.state = state;
     }
 
     @Override
     public String getState() {
-        return state;
+        return "";
     }
 
     /**
@@ -91,7 +82,6 @@ public class EndSessionResponse extends AuthorizationManagementResponse {
     public JSONObject jsonSerialize() {
         JSONObject json = new JSONObject();
         JsonUtil.put(json, KEY_REQUEST, endSessionRequest.jsonSerialize());
-        JsonUtil.putIfNotNull(json, KEY_STATE, state);
         return json;
     }
 
@@ -99,7 +89,7 @@ public class EndSessionResponse extends AuthorizationManagementResponse {
                                                        @NonNull Uri uri) {
         checkNotNull(request, "request can not be null");
         checkNotNull(uri, "uri can not be null");
-        return new EndSessionResponse(request, uri.getQueryParameter(EndSessionRequest.KEY_STATE));
+        return new EndSessionResponse(request);
     }
 
     /**
@@ -154,8 +144,7 @@ public class EndSessionResponse extends AuthorizationManagementResponse {
                 EndSessionRequest.jsonDeserialize(json.getJSONObject(KEY_REQUEST));
 
         return new EndSessionResponse(
-                request,
-                JsonUtil.getString(json, KEY_STATE)
+                request
             );
     }
 
